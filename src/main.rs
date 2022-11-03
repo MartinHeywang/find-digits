@@ -48,6 +48,21 @@ fn find_congruent_to_one(base: u64, nb_digits: u32) -> u64 {
 
     let modulo: u64 = u64::pow(10, nb_digits);
 
+    // special cases
+    if base == 13 && modulo % 10 == 0 {
+        // this is only based on something that we noticed through the runs
+        // and this saves precious seconds
+        return if modulo == 10 {
+            4
+        } else if modulo == 100 {
+            20
+        } else if modulo == 1000 {
+            100
+        } else {
+            modulo / 20
+        };
+    }
+
     let mut remainder: u64 = 1;
     let mut k: u64 = 0;
 
