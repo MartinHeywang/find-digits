@@ -37,8 +37,33 @@ fn find_digits(base: u64, exponent: u64, nb_digits: u32) -> u64 {
     let modulo: u64 = u64::pow(10, nb_digits);
     let mut current: u64 = 1;
 
-    for _ in 0..exponent {
-        current = current * base % modulo
+    // we use (modulo - 1) as the initialization value
+    // because it is a power of 10 -> the biggest number possible with nb_digits digits
+    let mut current_factor: u64 = modulo - 1;
+
+    let mut factor_idx: u64 = 0;
+    let factor_idx = loop {
+        match current_factor.checked_mul(base) {
+            Some(num) => current_factor = num,
+            None => break factor_idx,
+        }
+        factor_idx += 1;
+    };
+
+    let factor = base.pow((factor_idx).try_into().unwrap());
+
+    // maybe consider handling overflows with a checked_mul and applying the modulo only after overflows ?
+    // and exit the infinite loop to do the last multiplications
+
+    let exponent_quotient = exponent.div_euclid(factor_idx);
+    let exponent_remainder = exponent.rem_euclid(factor_idx);
+
+    for _k in 1..=exponent_quotient {
+        current = current * factor % modulo;
+    }
+
+    for _ in 1..=exponent_remainder {
+        current = current * base % modulo;
     }
 
     return current;
